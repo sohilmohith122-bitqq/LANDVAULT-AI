@@ -11,28 +11,53 @@ export default function LoginPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const login = useAuthStore((s) => s.login)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [showReset, setShowReset] = useState(false)
   const isTamil = i18n.language?.startsWith('ta')
 
-  const handleLogin = async (e?: FormEvent) => {
+  const [adminUser, setAdminUser] = useState('')
+  const [adminPass, setAdminPass] = useState('')
+  const [adminLoading, setAdminLoading] = useState(false)
+  const [adminError, setAdminError] = useState<string | null>(null)
+
+  const [officerUser, setOfficerUser] = useState('')
+  const [officerPass, setOfficerPass] = useState('')
+  const [officerLoading, setOfficerLoading] = useState(false)
+  const [officerError, setOfficerError] = useState<string | null>(null)
+
+  const [showReset, setShowReset] = useState(false)
+
+  const handleAdminLogin = async (e?: FormEvent) => {
     e?.preventDefault()
-    if (!username.trim() || !password.trim()) {
-      setError(t('auth.invalidCredentials'))
+    if (!adminUser.trim() || !adminPass.trim()) {
+      setAdminError(t('auth.invalidCredentials'))
       return
     }
-    setError(null)
-    setLoading(true)
+    setAdminError(null)
+    setAdminLoading(true)
     try {
-      await login(username.trim(), password)
+      await login(adminUser.trim(), adminPass)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(getApiErrorMessage(err))
+      setAdminError(getApiErrorMessage(err))
     } finally {
-      setLoading(false)
+      setAdminLoading(false)
+    }
+  }
+
+  const handleOfficerLogin = async (e?: FormEvent) => {
+    e?.preventDefault()
+    if (!officerUser.trim() || !officerPass.trim()) {
+      setOfficerError(t('auth.invalidCredentials'))
+      return
+    }
+    setOfficerError(null)
+    setOfficerLoading(true)
+    try {
+      await login(officerUser.trim(), officerPass)
+      navigate('/', { replace: true })
+    } catch (err) {
+      setOfficerError(getApiErrorMessage(err))
+    } finally {
+      setOfficerLoading(false)
     }
   }
 
@@ -100,38 +125,82 @@ export default function LoginPage() {
           </div>
 
           <h2 className="h-page">{t('auth.welcomeBack')}</h2>
-          <p className="body-muted mt-1">{t('auth.secureAccess')}</p>
+          <p className="body-muted mt-1">Sign in to your portal</p>
 
-          {error ? (
-            <Alert tone="danger" title={error} className="mt-5" />
-          ) : null}
-
-          <form className="mt-5 space-y-4" onSubmit={(e) => void handleLogin(e)} noValidate>
-            <label className="block">
-              <span className="label mb-1.5 block">{t('auth.username')}</span>
-              <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="e.g. officer.karthik" autoComplete="username" autoFocus />
-            </label>
-            <label className="block">
-              <span className="label mb-1.5 block">{t('auth.password')}</span>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
-            </label>
-            <div className="flex items-center justify-between">
-              <button type="button" onClick={() => setShowReset((v) => !v)} className="text-[12.5px] font-medium text-accent hover:underline">
-                {t('auth.forgotPassword')}
-              </button>
-              <span className="text-[11px] text-ink-faint">Official use only</span>
+          {/* Administrator login */}
+          <div className="mt-6 rounded-field border border-line-strong bg-white p-5">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[7px] bg-navy-900 text-white">
+                <ShieldCheck className="h-4 w-4" strokeWidth={1.9} />
+              </span>
+              <div>
+                <p className="text-[13.5px] font-bold leading-tight text-ink">Administrator</p>
+                <p className="text-[11px] text-ink-muted">Full system access</p>
+              </div>
             </div>
 
-            {showReset ? (
-              <Alert tone="info" title={t('auth.resetPassword')}>
-                Password resets are issued by the district system administrator. Contact your office IT desk with your employee ID.
-              </Alert>
+            {adminError ? (
+              <Alert tone="danger" title={adminError} className="mt-3" />
             ) : null}
 
-            <Button type="submit" size="lg" fullWidth loading={loading}>
-              {t('auth.signIn')}
-            </Button>
-          </form>
+            <form className="mt-4 space-y-3" onSubmit={(e) => void handleAdminLogin(e)} noValidate>
+              <label className="block">
+                <span className="label mb-1 block text-[12px]">Admin ID</span>
+                <Input value={adminUser} onChange={(e) => setAdminUser(e.target.value)} placeholder="e.g. admin" autoComplete="username" autoFocus />
+              </label>
+              <label className="block">
+                <span className="label mb-1 block text-[12px]">{t('auth.password')}</span>
+                <Input type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
+              </label>
+              <Button type="submit" size="lg" fullWidth loading={adminLoading} className="!bg-navy-900 hover:!bg-navy-950">
+                Sign in as Administrator
+              </Button>
+            </form>
+          </div>
+
+          {/* Officer login */}
+          <div className="mt-4 rounded-field border border-line bg-paper-soft p-5">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[7px] border border-line-strong text-ink-muted">
+                <ScanSearch className="h-4 w-4" strokeWidth={1.9} />
+              </span>
+              <div>
+                <p className="text-[13.5px] font-bold leading-tight text-ink">Officer</p>
+                <p className="text-[11px] text-ink-muted">Upload, review &amp; verify</p>
+              </div>
+            </div>
+
+            {officerError ? (
+              <Alert tone="danger" title={officerError} className="mt-3" />
+            ) : null}
+
+            <form className="mt-4 space-y-3" onSubmit={(e) => void handleOfficerLogin(e)} noValidate>
+              <label className="block">
+                <span className="label mb-1 block text-[12px]">Officer ID</span>
+                <Input value={officerUser} onChange={(e) => setOfficerUser(e.target.value)} placeholder="e.g. officer.karthik" autoComplete="username" />
+              </label>
+              <label className="block">
+                <span className="label mb-1 block text-[12px]">{t('auth.password')}</span>
+                <Input type="password" value={officerPass} onChange={(e) => setOfficerPass(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
+              </label>
+              <Button type="submit" size="lg" fullWidth variant="outline" loading={officerLoading}>
+                Sign in as Officer
+              </Button>
+            </form>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between">
+            <button type="button" onClick={() => setShowReset((v) => !v)} className="text-[12px] font-medium text-accent hover:underline">
+              {t('auth.forgotPassword')}
+            </button>
+            <span className="text-[11px] text-ink-faint">Official use only</span>
+          </div>
+
+          {showReset ? (
+            <Alert tone="info" title={t('auth.resetPassword')} className="mt-3">
+              Password resets are issued by the district system administrator. Contact your office IT desk with your employee ID.
+            </Alert>
+          ) : null}
         </div>
       </div>
     </div>
