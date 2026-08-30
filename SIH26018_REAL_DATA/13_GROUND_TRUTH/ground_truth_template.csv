@@ -1,0 +1,2 @@
+case_id,document_id,district,taluk,village,survey_number,subdivision_number,patta_number,owner_name,extent,extent_unit,land_classification,source_document,verified_by,verification_date,verification_status
+CASE001,patta_001.pdf,Coimbatore,Pollachi,ExampleVillage,124/2A,,P12345,,2.50,acre,Wet,patta,human_verified,2026-08-31,VERIFIED

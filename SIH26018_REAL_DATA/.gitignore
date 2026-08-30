@@ -1,0 +1,29 @@
+# --- LANDVAULT AI real-data privacy rules ---
+# NEVER commit personal or original government documents:
+SIH26018_REAL_DATA/13_GROUND_TRUTH/*
+!SIH26018_REAL_DATA/13_GROUND_TRUTH/README.md
+!SIH26018_REAL_DATA/13_GROUND_TRUTH/ground_truth_template.csv
+SIH26018_REAL_DATA/05_FMB/originals/
+SIH26018_REAL_DATA/02_PATTA/originals/
+SIH26018_REAL_DATA/03_CHITTA/originals/
+SIH26018_REAL_DATA/04_A_REGISTER/originals/
+SIH26018_REAL_DATA/06_ADANGAL/originals/
+SIH26018_REAL_DATA/07_ILR/originals/
+SIH26018_REAL_DATA/08_PATTA_TRANSFER/originals/
+SIH26018_REAL_DATA/10_REGISTRATION/originals/
+SIH26018_REAL_DATA/11_GUIDELINE_VALUE/originals/
+SIH26018_REAL_DATA/12_OCR/
+# Filled datasets may contain real owner names — keep local, share anonymized exports only:
+SIH26018_REAL_DATA/02_PATTA/patta.csv
+SIH26018_REAL_DATA/03_CHITTA/chitta.csv
+SIH26018_REAL_DATA/04_A_REGISTER/a_register.csv
+SIH26018_REAL_DATA/06_ADANGAL/adangal.csv
+SIH26018_REAL_DATA/07_ILR/ilr.csv
+SIH26018_REAL_DATA/08_PATTA_TRANSFER/patta_transfer.csv
+SIH26018_REAL_DATA/10_REGISTRATION/registration.csv
+SIH26018_REAL_DATA/10_REGISTRATION/ec.csv
+SIH26018_REAL_DATA/11_GUIDELINE_VALUE/guideline_value.csv
+# Backend secrets & databases
+.env
+*.db
+*.sqlite3

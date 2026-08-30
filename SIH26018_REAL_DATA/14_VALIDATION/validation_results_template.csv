@@ -1,0 +1,3 @@
+case_id,field,patta_value,chitta_value,a_register_value,adangal_value,gis_value,registration_value,match_status,confidence,reason
+CASE001,survey_number,124/2A,124/2A,124/2A,124/2A,124/2A,,MATCH,0.99,All available sources agree
+CASE002,extent,2.50 acres,2.48 acres,2.48 acres,,2.47 acres,,PARTIAL_MATCH,0.93,Small area variation

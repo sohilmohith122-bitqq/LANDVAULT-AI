@@ -1,0 +1,31 @@
+# ---- Node / frontend ----
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+*.tsbuildinfo
+frontend/vite-dev.log
+frontend/tsc-errors.txt
+frontend/audit-i18n-report.json
+
+# ---- Python / backend ----
+__pycache__/
+*.py[cod]
+.venv/
+backend/.venv/
+backend/data/*.db
+backend/data/*.db-journal
+backend/data/uploads/
+
+# ---- Secrets — never commit ----
+.env
+backend/.env
+*.local
+.env.*
+!.env.example
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

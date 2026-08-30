@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: rgb(var(--color-line));
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    font-size: var(--text-base);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  ::selection {
+    background: rgb(var(--color-accent-soft));
+    color: rgb(var(--color-accent-strong));
+  }
+
+  /* Focus visibility — keyboard users */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: 4px;
+  }
+
+  /* Scrollbars — calm, unobtrusive */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--color-line-strong) / 0.7);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--color-ink-faint) / 0.6);
+    background-clip: content-box;
+    border: 2px solid transparent;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Typography helpers */
+  .h-page {
+    @apply text-2xl font-bold tracking-tight text-ink;
+  }
+  .h-section {
+    @apply text-lg font-semibold tracking-tight text-ink;
+  }
+  .label {
+    @apply text-xs font-medium uppercase tracking-wide text-ink-faint;
+  }
+  .body-muted {
+    @apply text-sm text-ink-muted;
+  }
+  .numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Financial-grade section divider */
+  .section-divider {
+    @apply h-px w-full;
+    background: linear-gradient(to right, rgb(var(--color-line)), transparent);
+  }
+}

@@ -1,0 +1,100 @@
+/* ==========================================================================
+   LANDVAULT AI — Design Tokens
+   Government-grade premium design system
+   ========================================================================== */
+
+:root {
+  /* ---- Color system ------------------------------------------------ */
+  /* Deep navy / charcoal primary — trust, authority, stability */
+  --color-navy-950: 8 16 32;      /* #081020 */
+  --color-navy-900: 15 27 45;     /* #0F1B2D */
+  --color-navy-800: 23 39 66;     /* #172742 */
+  --color-navy-700: 33 55 90;     /* #21375A */
+
+  /* Warm off-white paper background — calm, non-glaring */
+  --color-paper: 246 244 239;     /* #F6F4EF */
+  --color-surface: 255 255 255;   /* #FFFFFF */
+  --color-surface-muted: 240 238 233; /* #F0EEE9 */
+
+  /* Charcoal ink — primary text */
+  --color-ink: 26 32 44;          /* #1A202C */
+  --color-ink-muted: 90 101 119;  /* #5A6577 */
+  --color-ink-faint: 136 145 161; /* #8891A1 */
+
+  /* Warm neutral borders */
+  --color-line: 225 221 213;      /* #E1DDD5 */
+  --color-line-strong: 205 200 189; /* #CDC8BD */
+
+  /* One restrained accent — deep trustworthy blue */
+  --color-accent: 28 92 147;      /* #1C5C93 */
+  --color-accent-soft: 232 240 248; /* #E8F0F8 */
+  --color-accent-strong: 18 70 116; /* #124674 */
+
+  /* Semantic — red/orange ONLY for warnings & conflicts */
+  --color-success: 30 125 70;     /* #1E7D46 */
+  --color-success-bg: 231 243 236;/* #E7F3EC */
+  --color-warning: 178 83 9;      /* #B25309 */
+  --color-warning-bg: 252 243 227;/* #FCF3E3 */
+  --color-danger: 180 35 24;      /* #B42318 */
+  --color-danger-bg: 251 234 232; /* #FBE9E8 */
+  --color-info: 71 100 150;       /* #476496 */
+  --color-info-bg: 236 241 248;   /* #ECF1F8 */
+
+  /* ---- Typography -------------------------------------------------- */
+  --font-sans: 'Inter', 'Noto Sans Tamil', system-ui, -apple-system, sans-serif;
+  --font-tamil: 'Noto Sans Tamil', 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.02em;
+
+  /* ---- Spacing (4px base) ----------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---- Border radius (restrained) --------------------------------- */
+  --radius-field: 8px;
+  --radius-panel: 10px;
+  --radius-chip: 999px;
+
+  /* ---- Shadows (subtle, layered) ---------------------------------- */
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.03);
+  --shadow-pop: 0 4px 12px rgba(16, 24, 40, 0.08), 0 12px 32px rgba(16, 24, 40, 0.1);
+  --shadow-nav: 0 1px 2px rgba(16, 24, 40, 0.03);
+  --shadow-focus: 0 0 0 3px rgba(28, 92, 147, 0.18);
+
+  /* ---- Motion (calm, purposeful only) ----------------------------- */
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---- Layout ------------------------------------------------------ */
+  --sidebar-width: 256px;
+  --sidebar-width-collapsed: 72px;
+  --topbar-height: 60px;
+}
+
+/* Dark surface variant for the sidebar / navigation chrome */
+[data-chrome='dark'] {
+  --chrome-bg: var(--color-navy-900);
+  --chrome-ink: 236 239 244;
+  --chrome-ink-muted: 156 168 186;
+  --chrome-line: 34 48 76;
+  --chrome-accent: 74 132 189;
+}
