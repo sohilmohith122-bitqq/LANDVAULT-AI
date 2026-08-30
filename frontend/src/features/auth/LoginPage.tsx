@@ -13,51 +13,38 @@ export default function LoginPage() {
   const login = useAuthStore((s) => s.login)
   const isTamil = i18n.language?.startsWith('ta')
 
-  const [adminUser, setAdminUser] = useState('')
-  const [adminPass, setAdminPass] = useState('')
-  const [adminLoading, setAdminLoading] = useState(false)
-  const [adminError, setAdminError] = useState<string | null>(null)
+  type Role = 'admin' | 'officer' | 'user'
 
-  const [officerUser, setOfficerUser] = useState('')
-  const [officerPass, setOfficerPass] = useState('')
-  const [officerLoading, setOfficerLoading] = useState(false)
-  const [officerError, setOfficerError] = useState<string | null>(null)
+  const ROLES: { id: Role; label: string; desc: string; icon: typeof ShieldCheck; placeholder: string }[] = [
+    { id: 'admin', label: 'Administrator', desc: 'Full system access', icon: ShieldCheck, placeholder: 'e.g. admin' },
+    { id: 'officer', label: 'Officer', desc: 'Upload, review & verify', icon: ScanSearch, placeholder: 'e.g. officer.karthik' },
+    { id: 'user', label: 'User', desc: 'Read-only access', icon: History, placeholder: 'e.g. viewer' },
+  ]
 
+  const [role, setRole] = useState<Role>('admin')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showReset, setShowReset] = useState(false)
 
-  const handleAdminLogin = async (e?: FormEvent) => {
-    e?.preventDefault()
-    if (!adminUser.trim() || !adminPass.trim()) {
-      setAdminError(t('auth.invalidCredentials'))
-      return
-    }
-    setAdminError(null)
-    setAdminLoading(true)
-    try {
-      await login(adminUser.trim(), adminPass)
-      navigate('/', { replace: true })
-    } catch (err) {
-      setAdminError(getApiErrorMessage(err))
-    } finally {
-      setAdminLoading(false)
-    }
-  }
+  const activeRole = ROLES.find((r) => r.id === role)!
 
-  const handleOfficerLogin = async (e?: FormEvent) => {
+  const handleLogin = async (e?: FormEvent) => {
     e?.preventDefault()
-    if (!officerUser.trim() || !officerPass.trim()) {
-      setOfficerError(t('auth.invalidCredentials'))
+    if (!username.trim() || !password.trim()) {
+      setError(t('auth.invalidCredentials'))
       return
     }
-    setOfficerError(null)
-    setOfficerLoading(true)
+    setError(null)
+    setLoading(true)
     try {
-      await login(officerUser.trim(), officerPass)
+      await login(username.trim(), password)
       navigate('/', { replace: true })
     } catch (err) {
-      setOfficerError(getApiErrorMessage(err))
+      setError(getApiErrorMessage(err))
     } finally {
-      setOfficerLoading(false)
+      setLoading(false)
     }
   }
 
@@ -127,80 +114,62 @@ export default function LoginPage() {
           <h2 className="h-page">{t('auth.welcomeBack')}</h2>
           <p className="body-muted mt-1">Sign in to your portal</p>
 
-          {/* Administrator login */}
-          <div className="mt-6 rounded-field border border-line-strong bg-white p-5">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[7px] bg-navy-900 text-white">
-                <ShieldCheck className="h-4 w-4" strokeWidth={1.9} />
-              </span>
-              <div>
-                <p className="text-[13.5px] font-bold leading-tight text-ink">Administrator</p>
-                <p className="text-[11px] text-ink-muted">Full system access</p>
-              </div>
-            </div>
-
-            {adminError ? (
-              <Alert tone="danger" title={adminError} className="mt-3" />
-            ) : null}
-
-            <form className="mt-4 space-y-3" onSubmit={(e) => void handleAdminLogin(e)} noValidate>
-              <label className="block">
-                <span className="label mb-1 block text-[12px]">Admin ID</span>
-                <Input value={adminUser} onChange={(e) => setAdminUser(e.target.value)} placeholder="e.g. admin" autoComplete="username" autoFocus />
-              </label>
-              <label className="block">
-                <span className="label mb-1 block text-[12px]">{t('auth.password')}</span>
-                <Input type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
-              </label>
-              <Button type="submit" size="lg" fullWidth loading={adminLoading} className="!bg-navy-900 hover:!bg-navy-950">
-                Sign in as Administrator
-              </Button>
-            </form>
+          {/* Role switcher */}
+          <div className="mt-6 grid grid-cols-3 gap-2" role="tablist" aria-label="Select role">
+            {ROLES.map((r) => {
+              const active = r.id === role
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => { setRole(r.id); setUsername(''); setPassword(''); setError(null) }}
+                  className={`flex flex-col items-center gap-1.5 rounded-field border px-2 py-3 text-center transition-colors ${
+                    active
+                      ? 'border-navy-900 bg-navy-900 text-white'
+                      : 'border-line-strong bg-white text-ink-muted hover:border-accent hover:text-accent'
+                  }`}
+                >
+                  <r.icon className="h-4.5 w-4.5" strokeWidth={1.9} aria-hidden />
+                  <span className="text-[12px] font-semibold leading-tight">{r.label}</span>
+                  <span className={`text-[10px] leading-tight ${active ? 'text-white/70' : 'text-ink-faint'}`}>{r.desc}</span>
+                </button>
+              )
+            })}
           </div>
 
-          {/* Officer login */}
-          <div className="mt-4 rounded-field border border-line bg-paper-soft p-5">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[7px] border border-line-strong text-ink-muted">
-                <ScanSearch className="h-4 w-4" strokeWidth={1.9} />
-              </span>
-              <div>
-                <p className="text-[13.5px] font-bold leading-tight text-ink">Officer</p>
-                <p className="text-[11px] text-ink-muted">Upload, review &amp; verify</p>
-              </div>
-            </div>
-
-            {officerError ? (
-              <Alert tone="danger" title={officerError} className="mt-3" />
-            ) : null}
-
-            <form className="mt-4 space-y-3" onSubmit={(e) => void handleOfficerLogin(e)} noValidate>
-              <label className="block">
-                <span className="label mb-1 block text-[12px]">Officer ID</span>
-                <Input value={officerUser} onChange={(e) => setOfficerUser(e.target.value)} placeholder="e.g. officer.karthik" autoComplete="username" />
-              </label>
-              <label className="block">
-                <span className="label mb-1 block text-[12px]">{t('auth.password')}</span>
-                <Input type="password" value={officerPass} onChange={(e) => setOfficerPass(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
-              </label>
-              <Button type="submit" size="lg" fullWidth variant="outline" loading={officerLoading}>
-                Sign in as Officer
-              </Button>
-            </form>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between">
-            <button type="button" onClick={() => setShowReset((v) => !v)} className="text-[12px] font-medium text-accent hover:underline">
-              {t('auth.forgotPassword')}
-            </button>
-            <span className="text-[11px] text-ink-faint">Official use only</span>
-          </div>
-
-          {showReset ? (
-            <Alert tone="info" title={t('auth.resetPassword')} className="mt-3">
-              Password resets are issued by the district system administrator. Contact your office IT desk with your employee ID.
-            </Alert>
+          {error ? (
+            <Alert tone="danger" title={error} className="mt-4" />
           ) : null}
+
+          {/* Single login form */}
+          <form className="mt-4 space-y-3.5" onSubmit={(e) => void handleLogin(e)} noValidate>
+            <label className="block">
+              <span className="label mb-1.5 block">{activeRole.label} ID</span>
+              <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={activeRole.placeholder} autoComplete="username" autoFocus />
+            </label>
+            <label className="block">
+              <span className="label mb-1.5 block">{t('auth.password')}</span>
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
+            </label>
+            <div className="flex items-center justify-between">
+              <button type="button" onClick={() => setShowReset((v) => !v)} className="text-[12.5px] font-medium text-accent hover:underline">
+                {t('auth.forgotPassword')}
+              </button>
+              <span className="text-[11px] text-ink-faint">Official use only</span>
+            </div>
+
+            {showReset ? (
+              <Alert tone="info" title={t('auth.resetPassword')}>
+                Password resets are issued by the district system administrator. Contact your office IT desk with your employee ID.
+              </Alert>
+            ) : null}
+
+            <Button type="submit" size="lg" fullWidth loading={loading}>
+              Sign in as {activeRole.label}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
