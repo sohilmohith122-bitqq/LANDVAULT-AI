@@ -59,7 +59,7 @@ export default function LoginPage() {
           </span>
           <div>
             <p className="text-[14px] font-bold tracking-tight">LANDVAULT AI</p>
-            <p className="text-[10.5px] font-medium uppercase tracking-[0.14em] text-[rgb(156_168_186)]">SIH-26018 · GovTech Platform</p>
+            <p className="text-[10.5px] font-medium uppercase tracking-[0.14em] text-[rgb(156_168_186)]">GovTech Platform</p>
           </div>
         </div>
 

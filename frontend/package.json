@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "LANDVAULT AI - Intelligent Land Record Digitization & Validation System (SIH26018)",
+  "description": "LANDVAULT AI - Intelligent Land Record Digitization & Validation System",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

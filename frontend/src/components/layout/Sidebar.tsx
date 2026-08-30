@@ -68,7 +68,7 @@ export function Sidebar() {
           {!collapsed ? (
             <div className="min-w-0">
               <p className="truncate text-[13px] font-bold tracking-tight text-white">LANDVAULT AI</p>
-              <p className="truncate text-[10px] font-medium uppercase tracking-wider text-[rgb(156_168_186)]">SIH-26018 · Govt Platform</p>
+              <p className="truncate text-[10px] font-medium uppercase tracking-wider text-[rgb(156_168_186)]">Govt Platform</p>
             </div>
           ) : null}
         </div>

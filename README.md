@@ -1,6 +1,6 @@
 # LANDVAULT AI
 
-**SIH26018 — Intelligent Land Record Digitization & Validation System (GovTech Platform)**
+**LANDVAULT AI — Intelligent Land Record Digitization & Validation System (GovTech Platform)**
 
 LandVault AI converts scanned, photographed, handwritten and multilingual Tamil Nadu land records (Patta, Chitta, FMB, A-Register, Adangal, Registration, GIS) into structured digital records — validates extracted information, detects conflicts, supports human-in-the-loop verification, and maintains an immutable audit trail.
 
