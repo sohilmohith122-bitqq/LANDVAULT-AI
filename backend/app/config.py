@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # --- Security ---
     secret_key: str = ""  # REQUIRED — init_db.py generates and persists one if missing
     token_ttl_seconds: int = 12 * 60 * 60  # 12h sessions
-    pbkdf2_iterations: int = 240_000
+    pbkdf2_iterations: int = 600_000  # OWASP 2024 guidance for PBKDF2-HMAC-SHA256
 
     # --- Uploads ---
     max_upload_mb: int = 25
@@ -37,7 +37,22 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    s = Settings()
+    # Production must fail closed: no deployments with weak/absent signing keys.
+    if s.environment == "production" and len(s.secret_key) < 32:
+        raise RuntimeError(
+            "SECRET_KEY must be configured (>= 32 chars) when ENVIRONMENT=production — refusing to start."
+        )
+    if not s.secret_key:
+        # Dev convenience: ephemeral per-process key (sessions reset on restart).
+        import secrets as _pysecrets
+
+        s.secret_key = _pysecrets.token_hex(32)
+        print(
+            "[config] WARNING: SECRET_KEY missing — generated an EPHEMERAL key for this process. "
+            "Run scripts/init_db.py to persist one."
+        )
+    return s
 
 
 settings = get_settings()

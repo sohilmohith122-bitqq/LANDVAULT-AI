@@ -470,3 +470,21 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
+
+class SessionToken(Base):
+    """Server-side session registry — enables instant token revocation.
+
+    Only the SHA-256 hash of each issued token is stored, so a database leak
+    cannot be replayed as a valid session. Logout (and admin kill-switches)
+    simply stamp `revoked_at`; `deps.get_current_user` refuses revoked rows.
+    """
+
+    __tablename__ = "session_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    user_id: Mapped[str] = mapped_column(String(40), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime)
+

@@ -28,4 +28,4 @@ backend/.env
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
+.vscode/frontend/vite-err.log

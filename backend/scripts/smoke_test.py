@@ -151,6 +151,14 @@ def main() -> None:
     r = client.post("/api/auth/login", json={"username": "admin", "password": "wrong"})
     check("bad login rejected", r.status_code == 401)
 
+    # --- security: server-side session revocation ---
+    r = client.post("/api/auth/login", json={"username": "admin", "password": "Admin@123"})
+    tok2 = r.json()["token"]
+    r = client.post("/api/auth/logout", headers={"Authorization": f"Bearer {tok2}"})
+    check("logout revokes session", r.status_code == 204)
+    r = client.get("/api/records", headers={"Authorization": f"Bearer {tok2}"})
+    check("revoked token rejected", r.status_code == 401)
+
     r = client.get("/api/records")
     check("records require auth", r.status_code == 401)
 
@@ -190,11 +198,20 @@ def main() -> None:
     check("document detail", r.status_code == 200 and r.json()["documentType"] == "PATTA")
     r = client.post(
         "/api/documents",
-        files={"file": ("scan.png", b"\x89PNG fake image bytes", "image/png")},
+        files={"file": ("scan.png", b"\x89PNG\r\n\x1a\n" + b"fake image body", "image/png")},
         data={"documentType": "CHITTA", "district": "Erode", "languages": ["ta"]},
         headers=headers,
     )
     check("document upload queues", r.status_code == 201 and r.json()["status"] == "QUEUED")
+
+    # --- security: content spoofing must be rejected (magic-byte check) ---
+    r = client.post(
+        "/api/documents",
+        files={"file": ("evil.pdf", b"MZ\x90\x00 not a pdf at all", "application/pdf")},
+        data={"documentType": "CHITTA", "district": "Erode", "languages": ["ta"]},
+        headers=headers,
+    )
+    check("spoofed extension rejected", r.status_code == 415)
 
     # --- audit + activity ---
     r = client.get("/api/audit", headers=headers)
@@ -211,6 +228,14 @@ def main() -> None:
     # --- stats ---
     r = client.get("/api/stats/overview", headers=headers)
     check("stats overview", r.status_code == 200 and "totalRecords" in r.json())
+
+    # --- security: brute-force lockout (LAST — locks this client for 'viewer') ---
+    # Limit is 5 failures / 5 min: attempts 1-5 get 401, attempt 6 gets 429.
+    for _ in range(6):
+        r = client.post("/api/auth/login", json={"username": "viewer", "password": "nope"})
+    check("brute-force lockout after 5 failures", r.status_code == 429)
+    r = client.post("/api/auth/login", json={"username": "viewer", "password": "Viewer@123"})
+    check("lockout holds even with correct password", r.status_code == 429)
 
     print()
     if failures:

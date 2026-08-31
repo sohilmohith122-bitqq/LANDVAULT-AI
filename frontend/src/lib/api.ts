@@ -121,10 +121,11 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
  * in `@/lib/demo-data` instead of calling the FastAPI backend — so the whole app
  * (including login) works with synthetic data and no backend running.
  *
- * Set `VITE_DEMO_MODE=0` (e.g. in `frontend/.env.local`) and start the backend
- * to use the real API.
+ * Demo mode is OPT-IN. A production build must never silently fall back to
+ * synthetic data and an accept-any-password auth path, so the default is OFF
+ * and demo mode requires an explicit `VITE_DEMO_MODE=1` (e.g. in .env.local).
  */
-export const DEMO_MODE = (import.meta.env.VITE_DEMO_MODE as string | undefined) !== '0'
+export const DEMO_MODE = (import.meta.env.VITE_DEMO_MODE as string | undefined) === '1'
 
 /** Wrap a list into the paginated envelope used by list endpoints. */
 function paginate<T>(items: T[], params: { page?: number; pageSize?: number } = {}): Paginated<T> {
@@ -468,6 +469,12 @@ export const parcelsApi = {
 /* ---------------------------------- Auth ---------------------------------- */
 
 export const authApi = {
+  /** Server-side session revocation (no-op in demo mode — there is no backend). */
+  logout: async (): Promise<void> => {
+    if (DEMO_MODE) return
+    await request<void>('/auth/logout', { method: 'POST' })
+  },
+
   login: async (username: string, password: string): Promise<{ user: User; token: string }> => {
     if (DEMO_MODE) {
       if (!password) throw new ApiError(401, 'Invalid username or password')

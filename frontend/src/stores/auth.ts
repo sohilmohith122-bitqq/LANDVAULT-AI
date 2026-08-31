@@ -35,6 +35,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
+    const { token } = get()
+    // Best-effort server-side revocation BEFORE clearing the stored session
+    // (the request reads the bearer token from localStorage). Never blocks UI.
+    if (token) void authApi.logout().catch(() => undefined)
     set({ user: null, token: null })
     localStorage.removeItem(STORAGE_KEY)
   },
