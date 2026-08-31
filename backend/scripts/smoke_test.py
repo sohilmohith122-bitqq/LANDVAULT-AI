@@ -17,6 +17,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 _tmpdir = tempfile.mkdtemp(prefix="landvault-smoke-")
 os.environ["DATABASE_URL"] = f"sqlite:///{(Path(_tmpdir) / 'smoke.db').as_posix()}"
+os.environ["MAX_UPLOAD_MB"] = "1"  # small limit so the oversize-rejection test stays cheap
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -228,6 +229,34 @@ def main() -> None:
     # --- stats ---
     r = client.get("/api/stats/overview", headers=headers)
     check("stats overview", r.status_code == 200 and "totalRecords" in r.json())
+
+    # --- security: hardened response headers on every response ---
+    r = client.get("/api/health")
+    check(
+        "security headers present",
+        r.headers.get("X-Content-Type-Options") == "nosniff"
+        and r.headers.get("X-Frame-Options") == "DENY"
+        and "frame-ancestors" in (r.headers.get("Content-Security-Policy") or "")
+        and r.headers.get("Cache-Control") == "no-store",
+    )
+
+    # --- security: logout must revoke the session server-side ---
+    r = client.post("/api/auth/logout", headers=viewer_headers)
+    check("logout returns 204", r.status_code == 204)
+    r = client.get("/api/records", headers=viewer_headers)
+    check("revoked session rejected", r.status_code == 401)
+    r = client.post("/api/auth/login", json={"username": "viewer", "password": "Viewer@123"})
+    check("re-login after logout works", r.status_code == 200)
+    viewer_headers = {"Authorization": f"Bearer {r.json()['token']}"}
+
+    # --- security: oversize must be rejected (limit lowered to 1 MB via env) ---
+    r = client.post(
+        "/api/documents",
+        files={"file": ("big.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * (2 * 1024 * 1024), "image/png")},
+        data={"documentType": "CHITTA", "district": "Erode", "languages": ["ta"]},
+        headers=headers,
+    )
+    check("oversized file rejected", r.status_code == 413)
 
     # --- security: brute-force lockout (LAST — locks this client for 'viewer') ---
     # Limit is 5 failures / 5 min: attempts 1-5 get 401, attempt 6 gets 429.
