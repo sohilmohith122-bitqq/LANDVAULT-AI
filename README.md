@@ -60,14 +60,40 @@ npm run dev        # http://localhost:5173
 ```bash
 cd backend
 python -m venv .venv && .venv\Scripts\activate   # Windows
-pip install -r requirements.txt                  # (if requirements file added)
+pip install -r requirements.txt
 python scripts/init_db.py        # writes SECRET_KEY to backend/.env, creates schema,
                                  # seeds admin/officer/verifier/viewer + ingests districts
 python scripts/smoke_test.py     # 21-check API + RBAC smoke test (isolated temp DB)
 .venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
-Seeded users print once on `init_db` (randomly generated passwords). Structure is ready for PostgreSQL + PostGIS via `DATABASE_URL`.
+Seeded users print once on `init_db` (randomly generated passwords).
+
+### Database — Supabase Postgres
+
+The backend runs on local SQLite by default (zero config) and switches to
+**Supabase Postgres** with one environment variable — no code changes.
+
+1. Create a project at [supabase.com](https://supabase.com) (free tier is enough).
+2. Copy `backend/.env.example` → `backend/.env` (or keep the existing one).
+3. In Supabase: **Project Settings → Database → Connection string → URI**.
+4. Paste it into `backend/.env` as `DATABASE_URL`, replacing `[YOUR-PASSWORD]`:
+
+```env
+DATABASE_URL=postgresql://postgres.<project-ref>:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:6543/postgres?sslmode=require
+```
+
+> Use the **pooler** URI (port `6543`) for the API. For schema migrations /
+> `init_db.py` you can use the direct URI (port `5432`) — both work.
+> Keep `?sslmode=require` — Supabase enforces TLS.
+
+5. Create the schema and seed it: `python scripts/init_db.py`
+6. Start the API — it now reads and writes Supabase.
+
+Connection handling (pooling, pre-ping, recycle) is already tuned for the
+Supabase pooler in `backend/app/database.py`. The `backend/.env` file is
+git-ignored — never commit real credentials.
+
 
 ## API surface (backend + demo parity)
 
